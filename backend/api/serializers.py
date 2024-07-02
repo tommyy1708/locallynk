@@ -1,6 +1,49 @@
 from rest_framework import serializers
-from .models import HouseRent, UsedStuffSale, HomemadeFood, DailyNews
+from .models import HouseRent, UsedStuffSale, HomemadeFood, DailyNews, CustomUser
+from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
 
+User = get_user_model()
+
+
+class CustomUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'first_name', 'last_name',
+                  'sex', 'date_of_birth', 'phone_number', 'address', 'password']
+        read_only_fields = ['id', 'email']  # ID and email should not be modified by the client
+        extra_kwargs = {
+            'password': {'write_only': True}, # Password should not be included in the output
+            'email': {'required': True},
+            'password': {'required': True}
+        }
+
+    def validate_email(self, value):
+        """
+        Check that the email is valid and unique.
+        """
+        if CustomUser.objects.filter(email=value).exists():
+            raise serializers.ValidationError("This email is already in use.")
+        return value
+
+    def validate_password(self, value):
+        """
+        Check that the password is valid.
+        """
+        if len(value) < 5:
+            raise serializers.ValidationError(
+                "Password must be at least 5 characters long.")
+        # Add more password validation logic if needed (e.g., special characters, digits, etc.)
+        return value
+
+    def create(self, validated_data):
+        validated_data['password'] = make_password(validated_data.get('password'))
+        return super(CustomUserSerializer, self).create(validated_data)
+
+    def update(self, instance, validated_data):
+        if 'password' in validated_data:
+            validated_data['password'] = make_password(validated_data.get('password'))
+        return super(CustomUserSerializer, self).update(instance, validated_data)
 
 class HouseRentSerializer(serializers.ModelSerializer):
     class Meta:
