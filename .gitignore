@@ -1,22 +1,22 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-
 # Virtual Environment
-venv/
-
-# Django specific
-*.log
-*.pot
-*.pyc
-*.pyo
-*.pyd
-.Python
-local_settings.py
-db.sqlite3
-media
+env/
 
 # General
 .DS_Store
 .env
+
+# Backend
+*.pyc
+__pycache__/
+*.log
+
+# Frontend
+/frontend/node_modules/
+/frontend/.next/
+/frontend/out/
+/frontend/build/
+/frontend/.env
+/frontend/.env*.local
+/frontend/coverage
+/frontend/*.tsbuildinfo
+/frontend/next-env.d.ts
