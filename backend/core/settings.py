@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt.token_blacklist",
     "rest_framework.authtoken",
     "api",
+    "corsheaders",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -74,8 +75,37 @@ REST_FRAMEWORK = {
     ),
 }
 
+# Allow all origins (for development purposes)
+CORS_ALLOW_ALL_ORIGINS = True
+# If you want to restrict to specific origins
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",
+#     # Add other origins as needed
+# ]
+# Allow specific HTTP methods (optional, defaults to allowing all methods)
+# CORS_ALLOW_METHODS = [
+#     "DELETE",
+#     "GET",
+#     "OPTIONS",
+#     "PATCH",
+#     "POST",
+#     "PUT",
+# ]
+# Allow specific headers (optional, defaults to allowing all headers)
+# CORS_ALLOW_HEADERS = [
+#     "accept",
+#     "accept-encoding",
+#     "authorization",
+#     "content-type",
+#     "dnt",
+#     "origin",
+#     "user-agent",
+#     "x-csrftoken",
+#     "x-requested-with",
+# ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
