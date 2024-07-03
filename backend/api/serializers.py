@@ -2,9 +2,25 @@ from rest_framework import serializers
 from .models import HouseRent, UsedStuffSale, HomemadeFood, DailyNews, CustomUser
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
 
 User = get_user_model()
 
+
+class UserLoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField()
+
+    def validate(self, data):
+        print('serializer data:', data)
+        email = data.get('email')
+        password = data.get('password')
+        user = authenticate(username=email, password=password)
+
+        if user and user.is_active:
+            return user
+        raise serializers.ValidationError("Invalid credentials")
 
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:

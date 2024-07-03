@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets, status
 from .models import HouseRent, UsedStuffSale, HomemadeFood, DailyNews,CustomUser
-from .serializers import HouseRentSerializer, UsedStuffSaleSerializer, HomemadeFoodSerializer, DailyNewsSerializer,CustomUserSerializer
+from .serializers import HouseRentSerializer, UsedStuffSaleSerializer, HomemadeFoodSerializer, DailyNewsSerializer, CustomUserSerializer, UserLoginSerializer
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
@@ -17,6 +17,21 @@ from rest_framework_simplejwt.views import TokenViewBase
 
 User = get_user_model()
 
+
+class UserLoginView(APIView):
+    permission_classes = ()
+    authentication_classes = ()
+
+    def post(self, request):
+        serializer = UserLoginSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.validated_data
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            }, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
