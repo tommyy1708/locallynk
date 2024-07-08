@@ -1,62 +1,72 @@
 'use client'; // Add this at the top of the file
 import { use, useState } from 'react';
-import { Form, Input, Button, Checkbox,message } from 'antd';
+import { Form, Input, Button, Checkbox, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import styles from './styles.module.css';
 import { useRouter } from 'next/navigation';
+import { loginAxios, setToken } from '../../lib/loginAxios';
 
 const LoginPage = () => {
   const navigate = useRouter();
   const [loading, setLoading] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
 
-  const onFinish = async (values) => {
-    // setLoading(true);
-    const data = {
-      email: values.username,
-      password: values.password,
-    }
-    const res = await fetch('http://localhost:8000/login/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-    console.log('res', res);
-    // Add your login logic here
-    // Simulate a login delay
-    if(res.status !== 200){
-      message.error('username or password is incorrect');
-      return;
-    }
+  const success_msg = (msg) => {
+    messageApi.success(msg);
+  }
 
-    setTimeout(() => {
-      setLoading(false);
-      message.success('Login successful');
-      navigate.push('/');
-    }, 1000);
-  };
+  const error_msg = (msg) => {
+    messageApi.error(msg);
+  }
+
+const handleLogin = async (values) => {
+    setLoading(true)
+    try {
+        const response = await loginAxios(values)
+        console.log('response', response);
+        if (response.status === 200) {
+            setToken(response.data)
+            success_msg('Login successful')
+            navigate.push('/')
+        } else {
+            setLoading(false)
+            error_msg('Email or password is incorrect')
+        }
+    } catch(error) {
+        setLoading(false)
+        if (error.response && error.response.data) {
+            error_msg(
+                error.response.data.email ||
+                'Email or password is incorrect'
+            )
+        } else {
+            error_msg('An unexpected error occurred')
+        }
+    }
+}
 
   return (
+    <>
+     {contextHolder}
     <div className={styles.container}>
       <Form
         name="normal_login"
         className="login-form"
         initialValues={{ remember: false }}
-        onFinish={onFinish}
+        onFinish={handleLogin}
       >
         <Form.Item
-          name="username"
+          name="email"
           rules={[
             {
               required: true,
-              message: 'Please input your Username!',
+              message: 'Please input your email!',
             },
           ]}
         >
           <Input
             prefix={<UserOutlined className="site-form-item-icon" />}
-            placeholder="Username"
+            placeholder="Email"
           />
         </Form.Item>
         <Form.Item
@@ -97,6 +107,7 @@ const LoginPage = () => {
         </Form.Item>
       </Form>
     </div>
+    </>
   );
 };
 
