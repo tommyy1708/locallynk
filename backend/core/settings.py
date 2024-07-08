@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 import os
 from dotenv import load_dotenv
@@ -23,12 +24,6 @@ print(os.getenv('DATABASE_NAME'))
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = "django-insecure-^_(-i!8_=xvxqdlr$fh@6y7@mgu_t)*jtwmvklnw0+7(mbvq=b"
 # Django settings
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
@@ -42,6 +37,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     "rest_framework",
+    "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
     "rest_framework.authtoken",
     "api",
@@ -57,22 +53,32 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = 'api.CustomUser'
 
+# ! Default authentication classes 07/02/2024
+# 'DEFAULT_AUTHENTICATION_CLASSES': [
+#     'rest_framework.authentication.SessionAuthentication',
+#     'rest_framework.authentication.TokenAuthentication',
+# ],
+# 'DEFAULT_PERMISSION_CLASSES': [
+#     'rest_framework.permissions.IsAuthenticated',
+# ],
+
+# ! DRF Simple JWT authentication classes 07/02/2024
 REST_FRAMEWORK = {
-    # ! Default authentication classes 07/02/2024
-    # 'DEFAULT_AUTHENTICATION_CLASSES': [
-    #     'rest_framework.authentication.SessionAuthentication',
-    #     'rest_framework.authentication.TokenAuthentication',
-    # ],
-    # 'DEFAULT_PERMISSION_CLASSES': [
-    #     'rest_framework.permissions.IsAuthenticated',
-    # ],
-    # ! DRF Simple JWT authentication classes 07/02/2024
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
+}
+
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
 # Allow all origins (for development purposes)
@@ -135,9 +141,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "core.wsgi.application"
 
-
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
     # "default": {
