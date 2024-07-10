@@ -30,7 +30,6 @@ import {
   DownOutlined,
 } from '@ant-design/icons';
 import styles from './page.module.css';
-import UserLogin from '../lib/login/UserLogin';
 // Redux
 import { logout } from '../lib/login/userSlice';
 import { useSelector, useDispatch } from 'react-redux';
@@ -81,8 +80,8 @@ const items = [
 
 
 const HomePage = () => {
-  const dispath = useDispatch();
-  const user = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const {isLoggedIn, name} = useSelector((state) => state.user);
 
    const [current, setCurrent] = useState('news');
   return (
@@ -119,7 +118,22 @@ const HomePage = () => {
               />
             </Col>
             <Col>
-              <UserLogin />
+              {isLoggedIn ? (
+                <Space>
+                  <Avatar icon={<UserOutlined />} />
+                  <span style={{ color: '#555' }}>{name}</span>
+                  <Button
+                    type="link"
+                    onClick={() => dispatch(logout())}
+                  >
+                    Logout
+                  </Button>
+                </Space>
+              ) : (
+                <Link href="/login">
+                  <Button type="primary">Login</Button>
+                </Link>
+              )}
             </Col>
           </Row>
         </Flex>

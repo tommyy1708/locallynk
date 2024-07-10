@@ -24,10 +24,15 @@ class UserLoginView(APIView):
 
     def post(self, request):
         serializer = UserLoginSerializer(data=request.data)
+
         if serializer.is_valid():
             user = serializer.validated_data
+            print('user_from_views', user)
             refresh = RefreshToken.for_user(user)
             return Response({
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'date_joined': user.date_joined,
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
             }, status=status.HTTP_200_OK)
