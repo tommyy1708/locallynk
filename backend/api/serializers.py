@@ -16,7 +16,7 @@ class UserLoginSerializer(serializers.Serializer):
         email = data.get('email')
         password = data.get('password')
         user = authenticate(username=email, password=password)
-        print('user:', user)
+        
         if user and user.is_active:
             return user
         raise serializers.ValidationError("Invalid credentials")

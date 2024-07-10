@@ -1,5 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit'
-
+import { createSlice } from '@reduxjs/toolkit';
 
 /**
  * Step 1: Import createSlice
@@ -9,10 +8,8 @@ import { createSlice } from '@reduxjs/toolkit'
  * Last Step: Export the slice reducer and back to the store.js add the reducer
  */
 
-
 const initialState = {
   isLoggedIn: false,
-  user: null,
 };
 
 export const userSlice = createSlice({
@@ -21,13 +18,11 @@ export const userSlice = createSlice({
   reducers: {
     login(state, action) {
       state.isLoggedIn = true;
-      state.user = action.payload;
     },
     logout(state) {
       state.isLoggedIn = false;
-      state.user = null;
-    }
-  }
+    },
+  },
 });
 
 export const { login, logout } = userSlice.actions;

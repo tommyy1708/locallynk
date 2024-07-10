@@ -7,7 +7,7 @@ import { Provider } from 'react-redux';
 
 const inter = Inter({ subsets: ['latin'] });
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children, }) {
 
   return (
     <html lang="en">
