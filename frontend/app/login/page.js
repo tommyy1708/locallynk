@@ -1,13 +1,16 @@
-'use client'; // Add this at the top of the file
-import { use, useEffect, useState } from 'react';
+"use client";
+
+import { useEffect, useState } from 'react';
 import { Form, Input, Button, Checkbox, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import styles from './styles.module.css';
 import { useRouter } from 'next/navigation';
-import { loginAxios, setToken } from '../../lib/loginAxios';
-import debounceFn from '../../lib/debounceFn';
+import { login_request, token_setup } from '../../lib/axiosInstacne';
 import { useDispatch, useSelector } from 'react-redux';
-import { login, logout } from '../../lib/login/userSlice';
+import { login } from '../../lib/redux/userSlice';
+import styles from './styles.module.css'
+import LoadingSpin from '../components/LoadingSpin';
+
+const { Item } = Form;
 
 const LoginPage = () => {
   const dispatch = useDispatch();
@@ -25,30 +28,32 @@ const LoginPage = () => {
 
   const handleLogin = async (values) => {
     setLoading(true);
-    try {
-      const response = await loginAxios(values);
-      if (response.status === 200) {
-        console.log('response=', response);
-        setToken(response.data);
+    await login_request(values).then((response) => {
+      if(response.status == 200) {
+        console.log('response', response);
+        token_setup(response.data);
         const data = response.data;
-        dispatch(login());
-        success_msg('Login successful');
-        navigate.push('/');
+        dispatch(
+          login({
+            user: data.first_name,
+            uid: data.uid,
+          })
+        );
+        success_msg('Login successful! Redirecting to home page...');
+        setTimeout(() => {
+          navigate.push('/');
+         }, 2000);
       } else {
         setLoading(false);
-        error_msg('Email or password is incorrect');
+        error_msg('Login failed. Please using correct email and password.');
       }
-    } catch (error) {
-      console.log('error=', error);
-      error_msg('Email or password is incorrect');
-      setLoading(false);
-    }
+    });
   };
-
 
   return (
     <>
       {contextHolder}
+      <SpinLoading loading={loading} />
       <div className={styles.container}>
         <Form
           name="normal_login"
@@ -56,7 +61,7 @@ const LoginPage = () => {
           initialValues={{ remember: false }}
           onFinish={handleLogin}
         >
-          <Form.Item
+          <Item
             name="email"
             rules={[
               {
@@ -71,8 +76,8 @@ const LoginPage = () => {
               }
               placeholder="Email"
             />
-          </Form.Item>
-          <Form.Item
+          </Item>
+          <Item
             name="password"
             rules={[
               {
@@ -88,22 +93,21 @@ const LoginPage = () => {
               type="password"
               placeholder="Password"
             />
-          </Form.Item>
-          <Form.Item>
-            <Form.Item
+          </Item>
+          <Item>
+            <Item
               name="remember"
               valuePropName="checked"
               noStyle
             >
               <Checkbox>Remember me</Checkbox>
-            </Form.Item>
-
+            </Item>
             <a className="login-form-forgot" href="">
               Forgot password
             </a>
-          </Form.Item>
+          </Item>
 
-          <Form.Item>
+          <Item>
             <Button
               type="primary"
               htmlType="submit"
@@ -113,7 +117,7 @@ const LoginPage = () => {
               Log in
             </Button>
             Or <a href="">register now!</a>
-          </Form.Item>
+          </Item>
         </Form>
       </div>
     </>
