@@ -1,27 +1,21 @@
-'use client';
+import './globals.css';
 import { Inter } from 'next/font/google';
-import '../styles/globals.css';
-import { ConfigProvider } from 'antd';
-import {store} from '../lib/store';
-import { Provider } from 'react-redux';
+import ReduxProvider from './components/ReduxProvider';
+// Use the AntdRegistry component for prevent the CSS-in-JS flicker
+import { AntdRegistry } from '@ant-design/nextjs-registry';
 
 const inter = Inter({ subsets: ['latin'] });
 
-export default function RootLayout({ children, }) {
-
+export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
         <title>Localynk</title>
       </head>
       <body className={inter.className}>
-        <Provider store={store}>
-          <ConfigProvider
-            theme={{ token: { colorPrimary: '#1890ff' } }}
-          >
-            {children}
-          </ConfigProvider>
-        </Provider>
+        <ReduxProvider>
+          <AntdRegistry>{children}</AntdRegistry>
+        </ReduxProvider>
       </body>
     </html>
   );
